@@ -10,4 +10,5 @@ public class BookReservation {
     private String readerName;
     private String readerAddress;
     private int numberOfCopies;
+    private String clientIp;
 }

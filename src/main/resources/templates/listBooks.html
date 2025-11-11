@@ -31,15 +31,18 @@
     <h1>Welcome to our Book Reservation App</h1>
 </header>
 <main>
-    <form action="/" method="POST">
+    <div class="top-nav">
+        <a href="/books/book-form">Add New Book</a>
+    </div>
+    <form action="/" method="get">
         <h2>Filter book:</h2>
 
         <label>Book Name:</label>
-        <input type="text" name="name">
+        <input type="text" name="searchText">
         <br/>
 
         <label>Minimum Average Rating:</label>
-        <input type="number" name="rating" step=".01" min="0" value="0">
+        <input type="number" name="minRating" step=".01" min="0" value="0">
         <br/>
 
         <br/>
@@ -52,9 +55,13 @@
              and the displayed text should be:
              Title: <book_title>, Genre: <book_genre>, Rating: <average_rating> -->
         <ul>
-            <li th:each="book : ${books}">
-                <input type="radio" name="book" th:value="${book.getTitle()}"/>
-                <label th:text="'Title: '+${book.getTitle()}+', Genre: '+${book.getGenre()}+', Rating: '+${book.getAverageRating()}"></label>
+            <li th:each="book : ${books}" class="book-option">
+                <input type="radio" name="bookId" th:value="${book.getId()}"/>
+                <label th:text="'Title: '+${book.getTitle()}+', Genre: '+${book.getGenre()}+', Rating: '+${book.getAverageRating()}+ ', Author: ' + ${book.getAuthor().getName()} + ' ' + ${book.getAuthor().getSurname()}"></label>
+                <div>
+                    <a class="edit" th:href="@{'/books/book-form/' + ${book.id}}">Edit</a>
+                    <a class="delete" th:href="@{'/books/delete/' + ${book.id}}" onclick="return confirm('Are you sure?');">Delete</a>
+                </div>
             </li>
         </ul>
 

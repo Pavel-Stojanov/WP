@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.lab.bootstrap;
 
 import jakarta.annotation.PostConstruct;
+import mk.ukim.finki.wp.lab.model.Author;
 import mk.ukim.finki.wp.lab.model.Book;
 import mk.ukim.finki.wp.lab.model.BookReservation;
 import org.springframework.stereotype.Component;
