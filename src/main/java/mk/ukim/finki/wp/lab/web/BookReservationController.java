@@ -25,16 +25,13 @@ public class BookReservationController {
             @RequestParam String readerName,
             @RequestParam String readerAddress,
             @RequestParam int numCopies,
-            @RequestParam Long bookId,
+            @RequestParam String bookTitle,
             HttpServletRequest request,
             Model model) {
 
-        Book selectedBook = bookService.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
-
         String clientIp = request.getRemoteAddr();
 
-        BookReservation reservation = bookReservationService.placeReservation(selectedBook.getTitle(), readerName, readerAddress, numCopies, clientIp);
+        BookReservation reservation = bookReservationService.placeReservation(bookTitle, readerName, readerAddress, numCopies, clientIp);
 
         model.addAttribute("reservation", reservation);
 

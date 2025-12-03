@@ -1,81 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Book Reservation - Welcome and choose a Book</title>
-    <style type="text/css">
-        body {
-            width: 800px;
-            margin: auto;
-            font-family: Arial, sans-serif;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Reservation - Welcome</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        .book-option-wrapper {
+            --bs-border-color: var(--bs-border-color-translucent);
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
         }
-        h1 {
-            color: #333;
+
+        .book-option-wrapper:hover {
+            background-color: var(--bs-primary-bg-subtle);
+            border-color: var(--bs-primary) !important;
         }
-        form {
-            margin-top: 20px;
+
+        .book-option-wrapper .form-check-label {
+            cursor: pointer;
         }
-        .book-option {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .book-option:hover {
-            background-color: #f5f5f5;
-        }
+
     </style>
+
 </head>
-<body>
-<header>
-    <h1>Welcome to our Book Reservation App</h1>
-</header>
-<main>
-    <div class="top-nav">
-        <a href="/books/book-form">Add New Book</a>
+<body class="bg-light-subtle min-vh-100 py-4 py-md-5">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-9">
+
+            <main class="card shadow-sm border-0 rounded-4 p-4 p-md-5">
+
+                <header class="text-center mb-4 mb-md-5">
+                    <h1 class="display-5 fw-bold text-primary-emphasis">
+                        <i class="bi bi-book-half me-2"></i>Book Reservation
+                    </h1>
+                    <p class="lead text-muted">Welcome to our digital library</p>
+                </header>
+
+                <form th:action="@{/books}" method="get" class="mb-4 p-4 bg-light border rounded-3">
+                    <fieldset>
+                        <legend class="h5 mb-3 fw-semibold">
+                            <i class="bi bi-search me-2"></i>Find a Book
+                        </legend>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md">
+                                <label for="bookName" class="form-label fw-medium">Book Name:</label>
+                                <input type="text" id="bookName" name="bookName" class="form-control">
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <label for="rating" class="form-label fw-medium">Min. Rating:</label>
+                                <input type="number" id="rating" name="rating" min="1" max="5" step="0.1" class="form-control">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="authorId" class="form-label fw-medium">Author:</label>
+
+                                <select id="authorId" name="authorId" class="form-select">
+
+                                    <option value="">All Authors</option>
+
+                                    <option th:each="author : ${authors}"
+                                            th:value="${author.id}"
+                                            th:text="${author.name + ' ' + author.surname}"
+
+                                            th:selected="${param.authorId != null && param.authorId[0] == author.id.toString()}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-auto">
+                                <button type="submit" class="btn btn-primary w-100">Search</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+
+                <hr class="my-4 my-md-5">
+
+                <!-- Reservation Form -->
+                <form th:action="@{/bookReservation}" method="POST">
+
+                    <fieldset class="mb-4">
+                        <legend class="h4 fw-semibold mb-3">1. Choose a book</legend>
+
+                        <div class="d-flex justify-content-end mb-3">
+                            <a th:href="@{/books/book-form}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Add a New Book
+                            </a>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+
+                            <div th:each="book, iterStat : ${books}" class="book-option-wrapper border rounded-3 p-3">
+
+                                <div class="d-flex align-items-start">
+
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="bookTitle"
+                                               th:id="'book-' + ${iterStat.index}"
+                                               th:value="${book.title}"
+                                               required>
+                                    </div>
+
+                                    <label class="form-check-label flex-grow-1 mx-3" th:for="'book-' + ${iterStat.index}">
+                                        <strong class="d-block mb-1 fs-6">Title:
+                                            <span th:text="${book.title}" class="fw-normal"></span>
+                                        </strong>
+                                        <span class="text-muted small">
+                      <strong>Genre:</strong> <span th:text="${book.genre}" class="fw-normal"></span>
+                    </span>
+                                        <span class="text-muted small ms-3">
+                      <strong>Rating:</strong> <span th:text="${book.averageRating}" class="fw-normal"></span>
+                    </span>
+                                        <span class="text-muted small ms-3">
+                      <strong>Author:</strong> <span th:text="${book.author.name} + ' ' + ${book.author.surname}" class="fw-normal"></span>
+                    </span>
+                                    </label>
+
+                                    <div class="d-flex flex-shrink-0">
+                                        <a th:href="@{/books/book-form/{id}(id=${book.id})}" class="btn btn-primary btn-sm">
+                                            Edit
+                                        </a>
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm ms-2"
+                                                th:form="'delete-form-' + ${book.id}">
+                                            Delete
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-4 mt-5">
+                        <legend class="h4 fw-semibold mb-3">2. Enter your information</legend>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" id="readerName" name="readerName" class="form-control" placeholder="Your Name" required>
+                            <label for="readerName">Your Name:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" id="readerAddress" name="readerAddress" class="form-control" placeholder="Your Address" required>
+                            <label for="readerAddress">Your Address:</label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-4">
+                        <legend class="h4 fw-semibold mb-3">3. Choose number of copies</legend>
+                        <div class="row">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="numCopies" class="form-label">Number of Copies:</label>
+                                <input type="number" id="numCopies" name="numCopies" class="form-control" min="1" max="10" value="1" required>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <input type="submit" class="btn btn-success btn-lg px-4"/>
+
+                </form>
+            </main><div class="d-none">
+            <form th:each="book : ${books}"
+                  th:id="'delete-form-' + ${book.id}"
+                  th:action="@{/books/delete/{id}(id=${book.id})}"
+                  th:method="POST">
+            </form>
+        </div>
+
+        </div>
     </div>
-    <form action="/" method="get">
-        <h2>Filter book:</h2>
+</div>
 
-        <label>Book Name:</label>
-        <input type="text" name="searchText">
-        <br/>
-
-        <label>Minimum Average Rating:</label>
-        <input type="number" name="minRating" step=".01" min="0" value="0">
-        <br/>
-
-        <br/>
-        <input type="submit" value="Filter books">
-    </form>
-    <form action="/bookReservation" method="POST">
-        <h2>Choose a book:</h2>
-        <!-- Display radio buttons for each book,
-             the value should be the book title
-             and the displayed text should be:
-             Title: <book_title>, Genre: <book_genre>, Rating: <average_rating> -->
-        <ul>
-            <li th:each="book : ${books}" class="book-option">
-                <input type="radio" name="bookId" th:value="${book.getId()}"/>
-                <label th:text="'Title: '+${book.getTitle()}+', Genre: '+${book.getGenre()}+', Rating: '+${book.getAverageRating()}+ ', Author: ' + ${book.getAuthor().getName()} + ' ' + ${book.getAuthor().getSurname()}"></label>
-                <div>
-                    <a class="edit" th:href="@{'/books/book-form/' + ${book.id}}">Edit</a>
-                    <a class="delete" th:href="@{'/books/delete/' + ${book.id}}" onclick="return confirm('Are you sure?');">Delete</a>
-                </div>
-            </li>
-        </ul>
-
-        <h2>Enter your information:</h2>
-        <label>Your Name:</label>
-        <input type="text" name="readerName" required><br/>
-        <label>Your Address:</label>
-        <input type="text" name="readerAddress" required><br/>
-
-        <h2>Choose number of copies:</h2>
-        <input type="number" name="numCopies" min="1" max="10" required><br/>
-        <br/>
-        <input type="submit" value="Reserve Book">
-    </form>
-</main>
 </body>
 </html>
